@@ -1,6 +1,7 @@
 package com.example.classdatabase;
 
 import android.app.Activity;
+import android.content.ContentValues;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
@@ -14,6 +15,7 @@ public class NewUser extends Activity {
 	EditText name;
 	EditText className;
 	SQLiteDatabase mydb;
+	String message;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -25,7 +27,7 @@ public class NewUser extends Activity {
 		className =(EditText)findViewById(R.id.className);
 		
 		Intent intent = getIntent();
-		String message = intent.getStringExtra("ID");
+		message = intent.getStringExtra("ID");
 		idNumber.setText(message);
 		
 		
@@ -41,9 +43,15 @@ public class NewUser extends Activity {
 	}
 	
 	public void submit(View v){
-		mydb.execSQL("CREATE TABLE IF NOT EXISTS test (id INTEGER PRIMARY KEY AUTOINCREMENT,name varchar,email varchar);");
-		String email = className.getText().toString();
-		mydb.execSQL("insert into test (email) values(?);",new String[]{email});
+		mydb = NewUser.this.openOrCreateDatabase("androidituts",MODE_PRIVATE,null);
+		String people = className.getText().toString();
+		//mydb.execSQL("INSERT INTO test (email) VALUES(?);",new String[]{email});
+		
+		ContentValues values = new ContentValues();
+		values.put("class", people);
+		values.put("name", message);
+		
+		mydb.insert("test", null, values);
 	}
 
 }

@@ -1,16 +1,18 @@
 package com.example.classdatabase;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 import android.app.Activity;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ExpandableListView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -27,6 +29,12 @@ public class MainActivity extends Activity
 	private String hold="";
     private String[] open = null;
     
+    ExpandableListAdapter listAdapter;
+    ExpandableListView expListView;
+    List<String> listDataHeader;
+    HashMap<String, List<String>> listDataChild;
+ 
+    
 	@Override
 	public void onCreate(Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
@@ -35,19 +43,34 @@ public class MainActivity extends Activity
 		name= (TextView)findViewById(R.id.entername);
 		save= (Button)findViewById(R.id.bsave);
 		
-		lv = (ListView)findViewById(R.id.list);
-		lv.setOnItemClickListener(new OnItemClickListener(){
+		//lv = (ListView)findViewById(R.id.list);
+		expListView = (ExpandableListView) findViewById(R.id.lvExp);
+		//prepareListData();
+		 
+        
+ 
+        // setting list adapter
+        
+        
+		/*lv.setOnItemClickListener(new OnItemClickListener(){
 			public void onItemClick(AdapterView<?>arg0, View arg1, int arg2, long arg3){
 				Toast.makeText(getApplicationContext(), data.get(arg2).toString(), Toast.LENGTH_LONG).show();
 			}
-		});
+		});*/
 		
 		mydb = MainActivity.this.openOrCreateDatabase("androidituts",MODE_PRIVATE,null);
-		mydb.execSQL("CREATE TABLE IF NOT EXISTS test (id INTEGER PRIMARY KEY AUTOINCREMENT,name varchar,email varchar);");
+		mydb.delete("test", null, null);
+		mydb.execSQL("CREATE TABLE IF NOT EXISTS test (id INTEGER PRIMARY KEY AUTOINCREMENT,name varchar,class varchar);");
 		
+		
+		//insert
 		save.setOnClickListener(new View.OnClickListener(){
 			public void onClick(View v){
-				scanBarCode(v);
+				//scanBarCode(v);
+				contents = name.getText().toString();
+				addToList(contents);
+				listAdapter = new ExpandableListAdapter(MainActivity.this, listDataHeader, listDataChild);
+				expListView.setAdapter(listAdapter);
 			}
 		});
 		
@@ -85,7 +108,7 @@ public class MainActivity extends Activity
 		});
 	}
 	
-	public void scanBarCode(View view) {
+	/*public void scanBarCode(View view) {
         Intent intent = new Intent("com.google.zxing.client.android.SCAN");
         intent.putExtra("SCAN_MODE", "PRODUCT_MODE");  
 
@@ -104,7 +127,7 @@ public class MainActivity extends Activity
 	            toast.show();
 	        }
 	    }
-	}
+	}*/
 	public void newUser(String contents){
 		if(true){
 			//create intent and ask for information- start new activity
@@ -117,5 +140,62 @@ public class MainActivity extends Activity
 		newIntent.putExtra("ID", contents);
 		startActivity(newIntent);
 	}
+	
+	public void onDestroy(){
+		super.onDestroy();
+	}
+	
+	public void addToList(String contents){
+		listDataHeader = new ArrayList<String>();
+		listDataHeader.add(contents);
+		
+		listDataChild = new HashMap<String, List<String>>();
+		List<String> names = new ArrayList<String>();
+		names.add("Name: " + "Michael");
+		names.add("Class: " + "Geometry");
+		names.add("Passes: " + "3");
+		
+		listDataChild.put(listDataHeader.get(0), names);
+		Log.i("Hello", "Stuck Here");
+	}
+	
+	 private void prepareListData() {
+	        listDataHeader = new ArrayList<String>();
+	        listDataChild = new HashMap<String, List<String>>();
+	 
+	        // Adding child data
+	        listDataHeader.add("Top 250");
+	        listDataHeader.add("Now Showing");
+	        listDataHeader.add("Coming Soon..");
+	 
+	        // Adding child data
+	        List<String> top250 = new ArrayList<String>();
+	        top250.add("The Shawshank Redemption");
+	        top250.add("The Godfather");
+	        top250.add("The Godfather: Part II");
+	        top250.add("Pulp Fiction");
+	        top250.add("The Good, the Bad and the Ugly");
+	        top250.add("The Dark Knight");
+	        top250.add("12 Angry Men");
+	 
+	        List<String> nowShowing = new ArrayList<String>();
+	        nowShowing.add("The Conjuring");
+	        nowShowing.add("Despicable Me 2");
+	        nowShowing.add("Turbo");
+	        nowShowing.add("Grown Ups 2");
+	        nowShowing.add("Red 2");
+	        nowShowing.add("The Wolverine");
+	 
+	        List<String> comingSoon = new ArrayList<String>();
+	        comingSoon.add("2 Guns");
+	        comingSoon.add("The Smurfs 2");
+	        comingSoon.add("The Spectacular Now");
+	        comingSoon.add("The Canyons");
+	        comingSoon.add("Europa Report");
+	 
+	        listDataChild.put(listDataHeader.get(0), top250); // Header, Child data
+	        listDataChild.put(listDataHeader.get(1), nowShowing);
+	        listDataChild.put(listDataHeader.get(2), comingSoon);
+	    }
 }
 
